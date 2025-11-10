@@ -51,7 +51,14 @@ async function run() {
 
     app.get("/reviews", async (req, res) => {
       try {
-        const cursor = reviewCollection.find();
+        const { email } = req.query;
+        console.log(email);
+
+        const filter = {};
+        if (email) filter.user_email = email;
+
+        const projectFields = { user_email: 0 };
+        const cursor = reviewCollection.find(filter).project(projectFields);
         const data = await cursor.toArray();
         res.send(data);
       } catch (error) {
