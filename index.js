@@ -84,6 +84,29 @@ async function run() {
       }
     });
 
+    app.patch("/edit-user-review/:reviewId", async (req, res) => {
+      const id = req.params.reviewId;
+      const query = { _id: new ObjectId(id) };
+      const updates = {
+        $set: req.body,
+      };
+
+      try {
+        const result = await reviewCollection.updateOne(query, updates);
+        console.log(result);
+
+        if (result.modifiedCount === 0) {
+          res
+            .status(404)
+            .send({ success: false, message: "Failed to update review!" });
+        }
+        res.send({ success: true, message: "review updated successfully" });
+      } catch (error) {
+        console.log("database error", error);
+        res.status(500).send({ success: false, message: "databse error" });
+      }
+    });
+
     app.delete("/delete-user-review/:reviewId", async (req, res) => {
       const id = req.params.reviewId;
       const query = { _id: new ObjectId(id) };
