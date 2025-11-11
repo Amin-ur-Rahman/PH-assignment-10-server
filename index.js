@@ -31,6 +31,7 @@ async function run() {
     await client.connect();
     const db = client.db("local-food-lovers-db");
     const reviewCollection = db.collection("food_reviews");
+    const favoriteCollection = db.collection("favorite_reviews");
 
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -48,6 +49,19 @@ async function run() {
       } catch (error) {
         console.log("request error!", error);
       }
+    });
+
+    app.post("/add-to-favorite", async (req, res) => {
+      const data = req.body;
+      const result = await favoriteCollection.insertOne(data);
+      if (!result.acknowledged) {
+        res.send({
+          success: false,
+          message: "Request error: could not added to favorites",
+        });
+      }
+      res.send({ success: true, message: `added to favorite ${result}` });
+      console.log(result);
     });
 
     app.get("/user-review/:userId", async (req, res) => {
