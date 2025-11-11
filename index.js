@@ -42,10 +42,28 @@ async function run() {
 
       try {
         const result = await reviewCollection.insertOne(query);
-        res.send(result);
+        if (result.acknowledged)
+          res.send({ success: true, message: "review added successfully" });
         console.log("review added successfully", result);
       } catch (error) {
         console.log("request error!", error);
+      }
+    });
+
+    app.get("/user-review/:userId", async (req, res) => {
+      const id = req.params.userId;
+      const query = { _id: new ObjectId(id) };
+      try {
+        const result = await reviewCollection.findOne(query);
+        if (!result) {
+          return res
+            .status(404)
+            .send({ success: false, message: "Review not found!" });
+        }
+        res.send({ review: result, success: true });
+      } catch (error) {
+        // res.send({success:false, message: "Server error"})
+        console.log(error.message);
       }
     });
 
@@ -75,9 +93,7 @@ async function run() {
         res.send({ success: true, message: "deletion successful" });
         console.log(result);
       } else {
-        res
-          .status(404)
-          .send({ success: false, message: "delete request failed" });
+        res.send({ success: false, message: "delete request failed" });
       }
     });
   } catch (error) {
