@@ -1,15 +1,15 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+require("dotenv").config();
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const cors = require("cors");
 
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 // vTavoOIHVG9gPnwF;
 // local-food-lovers-project;
 
-const uri =
-  "mongodb+srv://local-food-lovers-project:vTavoOIHVG9gPnwF@cluster0.ix21m2z.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ix21m2z.mongodb.net/?appName=Cluster0`;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -52,7 +52,7 @@ async function run() {
     app.get("/reviews", async (req, res) => {
       try {
         const { email } = req.query;
-        console.log(email);
+        // console.log(email);
 
         const filter = {};
         if (email) filter.user_email = email;
@@ -63,6 +63,21 @@ async function run() {
         res.send(data);
       } catch (error) {
         res.status(500).send(`Error: ${error.message}`);
+      }
+    });
+
+    app.delete("/delete-user-review/:reviewId", async (req, res) => {
+      const id = req.params.reviewId;
+      const query = { _id: new ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
+
+      if (result.deletedCount > 0) {
+        res.send({ success: true, message: "deletion successful" });
+        console.log(result);
+      } else {
+        res
+          .status(404)
+          .send({ success: false, message: "delete request failed" });
       }
     });
   } catch (error) {
