@@ -51,19 +51,6 @@ async function run() {
       }
     });
 
-    app.post("/add-to-favorite", async (req, res) => {
-      const data = req.body;
-      const result = await favoriteCollection.insertOne(data);
-      if (!result.acknowledged) {
-        res.send({
-          success: false,
-          message: "Request error: could not added to favorites",
-        });
-      }
-      res.send({ success: true, message: `added to favorite ` });
-      console.log(result);
-    });
-
     app.get("/user-review/:userId", async (req, res) => {
       const id = req.params.userId;
       const query = { _id: new ObjectId(id) };
@@ -132,6 +119,32 @@ async function run() {
       } else {
         res.send({ success: false, message: "delete request failed" });
       }
+    });
+
+    // favorites collection api
+
+    app.post("/add-to-favorite", async (req, res) => {
+      const data = req.body;
+      const result = await favoriteCollection.insertOne(data);
+      if (!result.acknowledged) {
+        res.send({
+          success: false,
+          message: "Request error: could not added to favorites",
+        });
+      }
+      res.send({ success: true, message: `added to favorite ` });
+      console.log(result);
+    });
+
+    app.get("/get-favorite", async (req, res) => {
+      const { email } = req.query;
+      const cursor = favoriteCollection.find({ favorite_of: email });
+      const favorites = await cursor.toArray();
+      const reviewIds = favorites.map((fav) => new ObjectId(fav.review_id));
+
+      const result = reviewCollection.find({ _id: { $in: reviewIds } });
+      const reviews = await result.toArray();
+      res.send(reviews);
     });
   } catch (error) {
     console.log("DB error", error);
