@@ -51,8 +51,8 @@ async function run() {
       }
     });
 
-    app.get("/user-review/:userId", async (req, res) => {
-      const id = req.params.userId;
+    app.get("/user-review/:reviewId", async (req, res) => {
+      const id = req.params.reviewId;
       const query = { _id: new ObjectId(id) };
       try {
         const result = await reviewCollection.findOne(query);
