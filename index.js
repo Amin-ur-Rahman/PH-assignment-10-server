@@ -104,7 +104,10 @@ async function run() {
         if (email) filter.user_email = email;
 
         const projectFields = { user_email: 0 };
-        const cursor = reviewCollection.find(filter).project(projectFields);
+        const cursor = reviewCollection
+          .find(filter)
+          .project(projectFields)
+          .sort({ created_at: -1 });
         const data = await cursor.toArray();
         res.send(data);
       } catch (error) {
