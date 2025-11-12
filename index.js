@@ -68,12 +68,39 @@ async function run() {
       }
     });
 
+    // app.get("/reviews-by-search", async(req, res) => {
+
+    //   const search = req.query.search;
+    //   const query = {};
+
+    //   if(search) {
+    //     query.foodName = { $regex: search, options: "i"};
+    //   }
+
+    //   const cursor = reviewCollection.find(query);
+    //   const result = await cursor.toArray();
+
+    // })
+
     app.get("/reviews", async (req, res) => {
       try {
         const { email } = req.query;
+        const search = req.query.search || "";
         // console.log(email);
 
-        const filter = {};
+        const filter = search
+          ? {
+              $or: [
+                { foodName: { $regex: search, $options: "i" } },
+                { restaurantName: { $regex: search, $options: "i" } },
+                { location: { $regex: search, $options: "i" } },
+              ],
+            }
+          : {};
+
+        // if (search) {
+        //   filter =
+        // }
         if (email) filter.user_email = email;
 
         const projectFields = { user_email: 0 };
