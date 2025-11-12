@@ -60,7 +60,7 @@ async function run() {
           message: "Request error: could not added to favorites",
         });
       }
-      res.send({ success: true, message: `added to favorite ${result}` });
+      res.send({ success: true, message: `added to favorite ` });
       console.log(result);
     });
 
