@@ -208,7 +208,9 @@ async function run() {
 
     app.delete("/delete-favorite/:favoriteId", async (req, res) => {
       const id = req.params.favoriteId;
-      const query = { _id: new ObjectId(id) };
+      console.log(id);
+
+      const query = { review_id: id };
 
       try {
         const result = await favoriteCollection.deleteOne(query);
@@ -223,7 +225,7 @@ async function run() {
         console.log(error.message);
       }
     });
-
+    // ----------------get favorite--------------
     app.get("/get-favorite", async (req, res) => {
       const { email } = req.query;
       const cursor = favoriteCollection.find({ favorite_of: email });
