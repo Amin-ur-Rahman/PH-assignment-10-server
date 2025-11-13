@@ -206,6 +206,27 @@ async function run() {
       console.log(result);
     });
 
+    // app.get("/get-dummy-data/:dummyId", async (req, res) => {
+    //   try {
+    //     const id = req.params.dummyId;
+    //     console.log(id);
+
+    //     const query = { review_id: id };
+    //     const result = await favoriteCollection.find(query).toArray();
+
+    //     if (!result || result.length === 0) {
+    //       return res
+    //         .status(404)
+    //         .send({ success: false, message: "No data found" });
+    //     }
+
+    //     res.send(result);
+    //   } catch (error) {
+    //     console.error("Error fetching dummy data:", error);
+    //     res.status(500).send({ success: false, message: "Server error" });
+    //   }
+    // });
+
     app.delete("/delete-favorite/:favoriteId", async (req, res) => {
       const id = req.params.favoriteId;
       console.log(id);
