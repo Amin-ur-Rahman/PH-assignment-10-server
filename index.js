@@ -68,19 +68,23 @@ async function run() {
       }
     });
 
-    // app.get("/reviews-by-search", async(req, res) => {
+    app.get("/get-top-rated-reviews", async (req, res) => {
+      try {
+        const result = await reviewCollection
+          .find()
+          .sort({ rating: -1 })
+          .limit(6)
+          .toArray();
 
-    //   const search = req.query.search;
-    //   const query = {};
-
-    //   if(search) {
-    //     query.foodName = { $regex: search, options: "i"};
-    //   }
-
-    //   const cursor = reviewCollection.find(query);
-    //   const result = await cursor.toArray();
-
-    // })
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({
+          success: false,
+          message: "Failed to fetch top-rated reviews",
+        });
+      }
+    });
 
     app.get("/reviews", async (req, res) => {
       try {
@@ -112,6 +116,42 @@ async function run() {
         res.send(data);
       } catch (error) {
         res.status(500).send(`Error: ${error.message}`);
+      }
+    });
+    // ------------top user api-------------
+
+    app.get("/top-user", async (req, res) => {
+      try {
+        const pipeline = [
+          {
+            $group: {
+              _id: "$user_email",
+              name: { $first: "$user_name" },
+              photo: { $first: "$user_photo" },
+              reviewCount: { $sum: 1 },
+              averageRating: { $avg: { $toDouble: "$rating" } },
+              favoriteRestaurant: { $first: "$restaurantName" },
+            },
+          },
+          { $sort: { reviewCount: -1, averageRating: -1 } },
+          { $limit: 1 },
+        ];
+
+        const result = await reviewCollection.aggregate(pipeline).toArray();
+
+        if (!result.length)
+          return res
+            .status(404)
+            .send({ success: false, message: "No users found" });
+
+        const topUser = result[0];
+
+        res.send({ success: true, topUser });
+      } catch (error) {
+        console.error(error);
+        res
+          .status(500)
+          .send({ success: false, message: "Failed to fetch top user" });
       }
     });
 
