@@ -166,6 +166,24 @@ async function run() {
       console.log(result);
     });
 
+    app.delete("/delete-favorite/:favoriteId", async (req, res) => {
+      const id = req.params.favoriteId;
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await favoriteCollection.deleteOne(query);
+
+        if (result.deletedCount > 0) {
+          res.send({ success: true, message: "items deleted successfully" });
+        } else {
+          res.send({ success: false, message: "Failed to delete item" });
+        }
+      } catch (error) {
+        res.status(500).send({ success: false, message: error.message });
+        console.log(error.message);
+      }
+    });
+
     app.get("/get-favorite", async (req, res) => {
       const { email } = req.query;
       const cursor = favoriteCollection.find({ favorite_of: email });
